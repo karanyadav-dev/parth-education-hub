@@ -1,0 +1,221 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  '''url      = env("DATABASE_URL")'''
+}
+
+model User {
+  id                String    @id @default(cuid())
+  name              String
+  email             String    @unique
+  password          String?
+  phone             String?   @unique
+  role              String    @default("STUDENT")
+  isVerified        Boolean   @default(false)
+  status            String    @default("ACTIVE")
+  image             String?
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  emailVerified     DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  courses           Course[]          @relation("TeacherCourses")
+  enrollments       Enrollment[]
+  videos            Video[]           @relation("TeacherVideos")
+  tests             Test[]            @relation("TeacherTests")
+  orders            Order[]
+  currentAffairs    CurrentAffair[]
+  reviews           Review[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+  @@index([status])
+  @@map("users")
+}
+
+model Course {
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  description     String?
+  category        String
+  price           Float     @default(0)
+  duration        String
+  students        Int       @default(0)
+  rating          Float     @default(0)
+  ratingCount     Int       @default(0)
+  thumbnail       String?
+  status          String    @default("DRAFT")
+  teacherId       String
+  teacher         User      @relation("TeacherCourses", fields: [teacherId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  enrollments     Enrollment[]
+  videos          Video[]
+  tests           Test[]
+  reviews         Review[]
+  orders          Order[]
+
+  @@index([teacherId])
+  @@index([category])
+  @@index([slug])
+  @@map("courses")
+}
+
+model Enrollment {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  courseId      String
+  course        Course    @relation(fields: [courseId], references: [id])
+  status        String    @default("ACTIVE")
+  progress      Int       @default(0)
+  enrolledAt    DateTime  @default(now())
+  completedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@map("enrollments")
+}
+
+model Video {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  url           String
+  thumbnail     String?
+  duration      String?
+  courseId      String
+  course        Course    @relation(fields: [courseId], references: [id])
+  teacherId     String
+  teacher       User      @relation("TeacherVideos", fields: [teacherId], references: [id])
+  views         Int       @default(0)
+  status        String    @default("DRAFT")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([courseId])
+  @@index([teacherId])
+  @@map("videos")
+}
+
+model Test {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  subject       String
+  duration      Int
+  totalMarks    Int
+  passingMarks  Int       @default(0)
+  pdfUrl        String?
+  courseId      String?
+  course        Course?   @relation(fields: [courseId], references: [id])
+  teacherId     String
+  teacher       User      @relation("TeacherTests", fields: [teacherId], references: [id])
+  isPublished   Boolean   @default(false)
+  status        String    @default("DRAFT")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  results       TestResult[]
+
+  @@index([teacherId])
+  @@index([courseId])
+  @@map("tests")
+}
+
+model TestResult {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  testId        String
+  test          Test      @relation(fields: [testId], references: [id])
+  score         Float
+  totalMarks    Float
+  percentage    Float
+  status        String    @default("PENDING")
+  isPassed      Boolean   @default(false)
+  submittedAt   DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([testId])
+  @@unique([userId, testId])
+  @@map("test_results")
+}
+
+model Order {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  courseId      String?
+  course        Course?   @relation(fields: [courseId], references: [id])
+  orderId       String?
+  paymentId     String?
+  signature     String?
+  amount        Float
+  currency      String    @default("INR")
+  status        String    @default("PENDING")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([paymentId])
+  @@map("orders")
+}
+
+model CurrentAffair {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  content       String
+  summary       String?
+  category      String    @default("GENERAL")
+  date          DateTime  @default(now())
+  pdfUrl        String?
+  imageUrl      String?
+  tags          String[]
+  views         Int       @default(0)
+  isPublished   Boolean   @default(true)
+  teacherId     String
+  teacher       User      @relation(fields: [teacherId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([date])
+  @@index([category])
+  @@index([slug])
+  @@map("current_affairs")
+}
+
+model Review {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  courseId      String
+  course        Course    @relation(fields: [courseId], references: [id])
+  rating        Int       @default(5)
+  comment       String?
+  isApproved    Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+  @@index([rating])
+  @@map("reviews")
+}
