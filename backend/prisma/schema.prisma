@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")   // ← ✅ Added
 }
 
 model User {
@@ -30,6 +31,7 @@ model User {
   orders            Order[]
   currentAffairs    CurrentAffair[]
   reviews           Review[]
+  testResults       TestResult[]
 
   @@index([email])
   @@index([phone])
