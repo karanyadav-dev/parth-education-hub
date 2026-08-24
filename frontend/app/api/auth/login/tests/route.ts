@@ -5,19 +5,12 @@ const prisma = new PrismaClient()
 
 export async function GET() {
   try {
-    const tests = await prisma.test.findMany({
-      include: {
-        course: true
-      },
-      where: {
-        isPublished: true
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
-
-    return NextResponse.json({ tests }, { status: 200 })
+    // ✅ Temporary - जब तक Test Model नहीं है
+    return NextResponse.json({
+      success: true,
+      message: 'Tests API - Model not implemented yet',
+      tests: []
+    }, { status: 200 })
   } catch (error) {
     console.error('Error fetching tests:', error)
     return NextResponse.json(
@@ -30,23 +23,24 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { title, description, type, duration, totalMarks, passingMarks, courseId, negativeMarks } = body
+    const { title, description, duration, totalMarks, passingMarks, subject } = body
 
-    const test = await prisma.test.create({
+    // ✅ Mock Response - जब तक Test Model नहीं है
+    return NextResponse.json({
+      success: true,
+      message: 'Test created successfully (mock)',
       data: {
+        id: 'mock-test-id',
         title,
         description,
-        type: type || 'MOCK_TEST',
         duration: parseInt(duration),
         totalMarks: parseInt(totalMarks),
-        passingMarks: parseInt(passingMarks),
-        negativeMarks: negativeMarks || 0.25,
-        courseId,
-        isPublished: true
+        passingMarks: parseInt(passingMarks) || 0,
+        subject: subject || 'General',
+        isPublished: true,
+        createdAt: new Date().toISOString()
       }
-    })
-
-    return NextResponse.json({ test }, { status: 201 })
+    }, { status: 201 })
   } catch (error) {
     console.error('Error creating test:', error)
     return NextResponse.json(

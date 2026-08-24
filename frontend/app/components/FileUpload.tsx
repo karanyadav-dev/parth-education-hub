@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/app/components/ui/button'
 import { toast } from 'sonner'
-import { Upload, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { Upload, Loader2 } from 'lucide-react'
 
 interface FileUploadProps {
   onUploadSuccess?: (url: string, publicId: string) => void
@@ -65,8 +65,8 @@ export function FileUpload({
         onChange={handleFileChange}
         disabled={uploading}
       />
-      <label htmlFor="file-upload">
-        <Button variant="outline" as="span" className="cursor-pointer" disabled={uploading}>
+      <label htmlFor="file-upload" className="cursor-pointer">
+        <Button variant="outline" disabled={uploading}>
           {uploading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />

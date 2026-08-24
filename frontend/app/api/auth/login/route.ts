@@ -19,13 +19,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find user
+    // ✅ Find user - Direct role String Use करें (NO include)
     const user = await prisma.user.findUnique({
-      where: { email },
-      include: { role: true }
+      where: { email }
     })
 
-    if (!user) {
+    if (!user || !user.password) {
       console.log('❌ User not found:', email)
       return NextResponse.json(
         { error: 'Invalid credentials' },
@@ -33,8 +32,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password || '')
+    // ✅ Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) {
       console.log('❌ Invalid password for:', email)
       return NextResponse.json(
@@ -43,9 +42,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate token
+    // ✅ Generate token - Direct user.role Use करें
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role?.name || 'STUDENT' },
+      { 
+        id: user.id, 
+        email: user.email, 
+        role: user.role || 'STUDENT'  // ✅ Direct String
+      },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '7d' }
     )
@@ -53,20 +56,21 @@ export async function POST(request: NextRequest) {
     console.log('✅ Login successful:', user.id)
 
     return NextResponse.json({
+      success: true,
       message: 'Login successful',
       token,
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role?.name || 'STUDENT'
+        role: user.role || 'STUDENT'  // ✅ Direct String
       }
     }, { status: 200 })
 
   } catch (error: any) {
     console.error('❌ Login error:', error)
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }
