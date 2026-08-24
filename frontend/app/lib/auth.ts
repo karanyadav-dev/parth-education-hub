@@ -1,11 +1,33 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import GoogleProvider from 'next-auth/providers/google'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
+
+// ✅ Extend NextAuth Types (Add this)
+declare module "next-auth" {
+  interface User {
+    role?: string
+  }
+  interface Session {
+    user: {
+      id?: string
+      name?: string | null
+      email?: string | null
+      image?: string | null
+      role?: string
+    }
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    role?: string
+    id?: string
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -18,7 +40,6 @@ export const authOptions: NextAuthOptions = {
     error: '/login',
   },
   providers: [
-    // Email + Password Login
     CredentialsProvider({
       name: 'credentials',
       credentials: {
@@ -30,9 +51,16 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Please enter email and password')
         }
 
+        // ✅ Correct: Directly select role
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
-          include: { role: true }
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            password: true,
+            role: true,  // ← Directly Select
+          }
         })
 
         if (!user || !user.password) {
@@ -52,7 +80,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           name: user.name,
           email: user.email,
-          role: user.role.name,
+          role: user.role,
         }
       }
     }),

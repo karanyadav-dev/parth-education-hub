@@ -8,16 +8,72 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(cuid())
-  name       String
-  email      String   @unique
-  password   String?
-  phone      String?  @unique
-  role       String   @default("STUDENT")
-  isVerified Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  password    String?
+  phone       String?  @unique
+  role        String   @default("STUDENT")
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  courses         Course[]          @relation("UserCourses")
+  currentAffairs  CurrentAffair[]
 
   @@index([email])
   @@index([phone])
+  @@map("users")
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  category    String
+  price       Float    @default(0)
+  duration    String
+  students    Int      @default(0)
+  rating      Float    @default(0)
+  ratingCount Int      @default(0)
+  thumbnail   String?
+  status      String   @default("DRAFT")
+  teacherId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relation
+  teacher     User     @relation("UserCourses", fields: [teacherId], references: [id])
+
+  @@index([teacherId])
+  @@index([category])
+  @@map("courses")
+}
+
+model CurrentAffair {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String
+  summary     String?
+  category    String   @default("GENERAL")
+  date        DateTime @default(now())
+  pdfUrl      String?
+  imageUrl    String?
+  tags        String[]
+  views       Int      @default(0)
+  isPublished Boolean  @default(true)
+  teacherId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relation
+  teacher     User     @relation(fields: [teacherId], references: [id])
+
+  @@index([date])
+  @@index([category])
+  @@index([slug])
+  @@map("current_affairs")
 }
