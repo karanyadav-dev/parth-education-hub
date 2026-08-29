@@ -6,7 +6,6 @@ import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
-// ✅ Extend NextAuth Types (Add this)
 declare module "next-auth" {
   interface User {
     role?: string
@@ -30,7 +29,8 @@ declare module "next-auth/jwt" {
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  // ✅ FIX: Add 'as any' to bypass TypeScript version mismatch
+  adapter: PrismaAdapter(prisma) as any,
   session: {
     strategy: 'jwt'
   },
@@ -51,7 +51,6 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Please enter email and password')
         }
 
-        // ✅ Correct: Directly select role
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
           select: {
@@ -59,7 +58,7 @@ export const authOptions: NextAuthOptions = {
             name: true,
             email: true,
             password: true,
-            role: true,  // ← Directly Select
+            role: true,
           }
         })
 

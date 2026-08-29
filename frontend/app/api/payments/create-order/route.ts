@@ -1,33 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server'
-import Razorpay from 'razorpay'
+// ✅ Build के दौरान यह Route Static Generate नहीं होगा
+export const dynamic = 'force-dynamic';
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-})
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { amount, currency, receipt } = body
+    const body = await request.json();
 
-    const order = await razorpay.orders.create({
-      amount: amount * 100, // Paise mein convert
-      currency: currency || 'INR',
-      receipt: receipt || 'receipt_' + Date.now(),
-    })
+    // ✅ Backend API को Call करें (Razorpay Backend पर है)
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const response = await fetch(`${backendUrl}/api/payments/create-order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
 
-    return NextResponse.json({
-      success: true,
-      order,
-      key_id: process.env.RAZORPAY_KEY_ID,
-    })
+    const data = await response.json();
 
-  } catch (error) {
-    console.error('Payment error:', error)
+    if (!response.ok) {
+      throw new Error(data.error || 'Payment order failed');
+    }
+
+    return NextResponse.json(data);
+  } catch (error: any) {
+    console.error('Proxy error:', error);
     return NextResponse.json(
-      { error: 'Failed to create order' },
+      { error: error.message || 'Failed to create order' },
       { status: 500 }
-    )
+    );
   }
 }
