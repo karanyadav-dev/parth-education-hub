@@ -101,9 +101,18 @@ const Footer = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="flex-1 bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500 focus:ring-secondary"
               />
-              <Button variant="gradient" type="submit" loading={isSubscribing} className="flex-shrink-0">
-                <Send className="w-4 h-4 mr-2" />
-                Subscribe
+              <Button variant="gradient" type="submit" disabled={isSubscribing} className="flex-shrink-0">
+                {isSubscribing ? (
+                  <>
+                    <span className="animate-spin w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full"></span>
+                    Subscribing...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Subscribe
+                  </>
+                )}
               </Button>
             </form>
           </div>
