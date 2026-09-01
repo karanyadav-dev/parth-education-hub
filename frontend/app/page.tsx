@@ -54,17 +54,16 @@ export default function Home() {
 
   // ✅ All Exams
   const examCategories = [
-    { name: 'UPSC & State PSC', icon: Shield, color: 'from-orange-500 to-red-500', count: '10+ Exams' },
-    { name: 'SSC Exams', icon: GraduationCap, color: 'from-blue-500 to-cyan-500', count: '8+ Exams' },
-    { name: 'Banking Exams', icon: BarChart3, color: 'from-emerald-500 to-teal-500', count: '10+ Exams' },
-    { name: 'Railway Exams', icon: Globe, color: 'from-purple-500 to-pink-500', count: '7+ Exams' },
-    { name: 'CET (10+2 & Graduate)', icon: UserCheck, color: 'from-teal-500 to-cyan-600', count: '10+ Exams' },
-    { name: 'CUET', icon: Library, color: 'from-purple-600 to-indigo-600', count: '6+ Exams' },
-    { name: 'RPSC', icon: MapPin, color: 'from-red-500 to-orange-500', count: '14+ Exams' },
-    { name: 'RSSB', icon: Building2, color: 'from-amber-500 to-yellow-600', count: '20+ Exams' },
-    { name: 'Police Exams', icon: Shield, color: 'from-blue-600 to-indigo-600', count: '10+ Exams' },
-    { name: 'Defence Exams', icon: Target, color: 'from-indigo-500 to-blue-500', count: '10+ Exams' },
-    { name: 'Teaching Exams', icon: BookOpen, color: 'from-green-500 to-emerald-500', count: '10+ Exams' },
+    { name: 'SSC', slug: 'ssc', icon: GraduationCap, color: 'from-blue-500 to-cyan-500', count: '8+ Exams' },
+    { name: 'Banking', slug: 'banking', icon: BarChart3, color: 'from-emerald-500 to-teal-500', count: '10+ Exams' },
+    { name: 'Railway', slug: 'railway', icon: Globe, color: 'from-purple-500 to-pink-500', count: '7+ Exams' },
+    { name: 'UPSC', slug: 'upsc', icon: Shield, color: 'from-orange-500 to-red-500', count: '10+ Exams' },
+    { name: 'CET', slug: 'cet', icon: UserCheck, color: 'from-teal-500 to-cyan-600', count: '10+ Exams' },
+    { name: 'RPSC', slug: 'rpsc', icon: MapPin, color: 'from-red-500 to-orange-500', count: '14+ Exams' },
+    { name: 'RSSB', slug: 'rssb', icon: Building2, color: 'from-amber-500 to-yellow-600', count: '20+ Exams' },
+    { name: 'Police', slug: 'police', icon: Shield, color: 'from-blue-600 to-indigo-600', count: '10+ Exams' },
+    { name: 'Defence', slug: 'defence', icon: Target, color: 'from-indigo-500 to-blue-500', count: '10+ Exams' },
+    { name: 'Teaching', slug: 'teaching', icon: BookOpen, color: 'from-green-500 to-emerald-500', count: '10+ Exams' },
   ]
 
   // ✅ NOTES DATA
@@ -329,7 +328,7 @@ export default function Home() {
           >
             {examCategories.map((exam, idx) => (
               <motion.div key={idx} variants={item}>
-                <Link href={`/exams/${exam.name.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-').replace(/\(/g, '').replace(/\)/g, '')}`}>
+                <Link href={`/exams/${exam.slug}`}>
                   <Card className="hover:shadow-xl transition-all hover:-translate-y-1 hover:border-secondary/50 cursor-pointer h-full">
                     <CardContent className="p-4 md:p-6 text-center">
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${exam.color} mx-auto flex items-center justify-center mb-3`}>
