@@ -66,7 +66,6 @@ router.get('/exams/:category', async (req, res) => {
       }
     });
 
-    // ✅ Exam Foundation Course Data
     const examData = {
       name: category,
       title: getExamTitle(category),
