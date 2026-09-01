@@ -5,7 +5,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // ✅ GET ALL COURSES FOR EXAMS PAGE
-router.get('/exams', async (req, res) => {
+router.get('/exams', async (_req, res) => {
   try {
     const courses = await prisma.course.findMany({
       where: { status: 'PUBLISHED' },
@@ -66,7 +66,7 @@ router.get('/exams/:category', async (req, res) => {
       }
     });
 
-    // ✅ Exam Data
+    // ✅ Exam Foundation Course Data
     const examData = {
       name: category,
       title: getExamTitle(category),
@@ -136,7 +136,7 @@ function getExamIcon(category: string): string {
 }
 
 // ✅ GET ALL COURSES (Admin)
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   try {
     const courses = await prisma.course.findMany({
       orderBy: { createdAt: 'desc' },
