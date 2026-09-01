@@ -128,12 +128,12 @@ const Navbar = () => {
     { href: '/classes', label: 'Live Classes', icon: Video },
     { href: '/all-exams', label: 'All Exams', icon: Layers, megaMenu: true },
     { href: '/courses', label: 'Courses', icon: BookOpen, megaMenu: true },
-    { href: '/test-series', label: 'Test Series', icon: BarChart3 }, // ✅ Test Series link
+    { href: '/test-series', label: 'Test Series', icon: BarChart3 },
     { href: '/current-affairs', label: 'Current Affairs', icon: Newspaper },
     { href: '/job-alerts', label: 'Jobs', icon: Briefcase },
   ]
 
-  const megaMenuItems = {
+  const megaMenuItems: Record<string, any[]> = {
     'All Exams': [
       { title: 'UPSC & State PSC', icon: Shield, href: '/exams/upsc', items: ['UPSC', 'BPSC', 'UP-PSC', 'MP-PSC'] },
       { title: 'SSC Exams', icon: GraduationCap, href: '/exams/ssc', items: ['CGL', 'CPO', 'CHSL', 'MTS'] },
@@ -215,14 +215,14 @@ const Navbar = () => {
                 {link.megaMenu && activeMegaMenu === link.label && (
                   <div className="absolute top-full left-0 w-screen max-w-4xl bg-white dark:bg-primary rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 p-6 animate-in fade-in slide-in-from-top-5 duration-200">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                      {megaMenuItems[link.label as keyof typeof megaMenuItems]?.map((section, idx) => (
+                      {megaMenuItems[link.label]?.map((section, idx) => (
                         <div key={idx}>
                           <div className="flex items-center gap-2 mb-3">
                             <section.icon className="w-5 h-5 text-secondary" />
                             <h4 className="font-semibold text-sm">{section.title}</h4>
                           </div>
                           <ul className="space-y-2">
-                            {section.items.map((item) => (
+                            {section.items.map((item: string) => (
                               <li key={item}>
                                 <Link
                                   href={`${section.href}/${item.toLowerCase()}`}
