@@ -119,6 +119,20 @@
   @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent;
 }
 
+/* ✅ Add this missing animation */
+@keyframes animate-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: animate-shimmer 2s infinite;
+}
+
 /* Custom Utilities */
 .section-padding {
   @apply py-16 md:py-24;
