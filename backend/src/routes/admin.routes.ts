@@ -37,7 +37,7 @@ const upload = multer({ storage: pdfStorage });
 // ADMIN IMAGE UPLOAD SETUP
 // ==========================================
 const imageStorage = multer.diskStorage({
-  destination: (_req, file, cb) => {
+  destination: (_req, _file, cb) => {
     const uploadDir = './uploads/admin';
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
