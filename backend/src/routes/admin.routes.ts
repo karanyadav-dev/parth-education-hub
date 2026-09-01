@@ -5,6 +5,20 @@ import { PrismaClient } from '@prisma/client';
 import path from 'path';
 import fs from 'fs';
 
+// ✅ Add this for req.user type
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        email: string;
+        name: string;
+        role: string;
+      };
+    }
+  }
+}
+
 const router = express.Router();
 const prisma = new PrismaClient();
 
@@ -280,7 +294,7 @@ router.post('/courses/add', async (req, res) => {
         price: parseFloat(price) || 0,
         duration: duration || '',
         status: 'DRAFT',
-        teacherId: req.user?.id || 'admin',
+        teacherId: (req as any).user?.id || 'admin',
       }
     });
 
@@ -351,7 +365,7 @@ router.post('/tests/add', upload.single('pdfFile'), async (req, res) => {
         pdfUrl: pdfPath,
         status: 'DRAFT',
         isPublished: true,
-        teacherId: req.user?.id || 'admin',
+        teacherId: (req as any).user?.id || 'admin',
       }
     });
 
@@ -400,7 +414,7 @@ router.delete('/tests/:id', async (req, res) => {
 // ==========================================
 router.post('/current-affairs/add', upload.single('pdfFile'), async (req, res) => {
   try {
-    const { title, content, date, category, source, summary } = req.body;
+    const { title, content, date, category, summary } = req.body;
     const pdfPath = req.file?.path || null;
 
     if (!title) {
@@ -422,7 +436,7 @@ router.post('/current-affairs/add', upload.single('pdfFile'), async (req, res) =
         date: date ? new Date(date) : new Date(),
         pdfUrl: pdfPath || '',
         isPublished: true,
-        teacherId: req.user?.id || 'admin',
+        teacherId: (req as any).user?.id || 'admin',
       }
     });
 
@@ -471,7 +485,7 @@ router.delete('/current-affairs/:id', async (req, res) => {
 // ==========================================
 router.get('/profile', async (req, res) => {
   try {
-    const adminId = req.user?.id;
+    const adminId = (req as any).user?.id;
     
     if (!adminId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -504,7 +518,7 @@ router.get('/profile', async (req, res) => {
 // ==========================================
 router.put('/profile', async (req, res) => {
   try {
-    const adminId = req.user?.id;
+    const adminId = (req as any).user?.id;
     
     if (!adminId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -543,7 +557,7 @@ router.put('/profile', async (req, res) => {
 // ==========================================
 router.post('/upload-image', imageUpload.single('image'), async (req, res) => {
   try {
-    const adminId = req.user?.id;
+    const adminId = (req as any).user?.id;
     
     if (!adminId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -579,8 +593,9 @@ router.post('/upload-image', imageUpload.single('image'), async (req, res) => {
   }
 });
 
-export default router;
-// GET ALL COURSES (Public)
+// ==========================================
+// 16. GET ALL COURSES (PUBLIC)
+// ==========================================
 router.get('/courses/public', async (_req, res) => {
   try {
     const courses = await prisma.course.findMany({
@@ -620,3 +635,5 @@ router.get('/courses/public', async (_req, res) => {
     return res.status(500).json({ error: 'Failed to fetch courses' });
   }
 });
+
+export default router;
