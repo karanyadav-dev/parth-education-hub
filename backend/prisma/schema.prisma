@@ -8,30 +8,28 @@ datasource db {
 }
 
 model User {
-  id                String    @id @default(cuid())
-  name              String
-  email             String    @unique
-  password          String?
-  phone             String?   @unique
-  role              String    @default("STUDENT")
-  isVerified        Boolean   @default(false)
-  status            String    @default("ACTIVE")
-  image             String?
-  resetToken        String?
-  resetTokenExpiry  DateTime?
-  emailVerified     DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  // Relations
-  courses           Course[]          @relation("TeacherCourses")
-  enrollments       Enrollment[]
-  videos            Video[]           @relation("TeacherVideos")
-  tests             Test[]            @relation("TeacherTests")
-  orders            Order[]
-  currentAffairs    CurrentAffair[]
-  reviews           Review[]
-  testResults       TestResult[]
+  id               String          @id @default(cuid())
+  name             String
+  email            String          @unique
+  password         String?
+  phone            String?         @unique
+  role             String          @default("STUDENT")
+  isVerified       Boolean         @default(false)
+  status           String          @default("ACTIVE")
+  image            String?
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  emailVerified    DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  courses          Course[]        @relation("TeacherCourses")
+  currentAffairs   CurrentAffair[]
+  enrollments      Enrollment[]
+  orders           Order[]
+  reviews          Review[]
+  testResults      TestResult[]
+  tests            Test[]          @relation("TeacherTests")
+  videos           Video[]         @relation("TeacherVideos")
 
   @@index([email])
   @@index([phone])
@@ -41,29 +39,27 @@ model User {
 }
 
 model Course {
-  id              String    @id @default(cuid())
-  title           String
-  slug            String    @unique
-  description     String?
-  category        String
-  price           Float     @default(0)
-  duration        String
-  students        Int       @default(0)
-  rating          Float     @default(0)
-  ratingCount     Int       @default(0)
-  thumbnail       String?
-  status          String    @default("DRAFT")
-  teacherId       String
-  teacher         User      @relation("TeacherCourses", fields: [teacherId], references: [id])
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  // Relations
-  enrollments     Enrollment[]
-  videos          Video[]
-  tests           Test[]
-  reviews         Review[]
-  orders          Order[]
+  id          String       @id @default(cuid())
+  title       String
+  slug        String       @unique
+  description String?
+  category    String
+  price       Float        @default(0)
+  duration    String
+  students    Int          @default(0)
+  rating      Float        @default(0)
+  ratingCount Int          @default(0)
+  thumbnail   String?
+  status      String       @default("DRAFT")
+  teacherId   String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  teacher     User         @relation("TeacherCourses", fields: [teacherId], references: [id])
+  enrollments Enrollment[]
+  orders      Order[]
+  reviews     Review[]
+  tests       Test[]
+  videos      Video[]
 
   @@index([teacherId])
   @@index([category])
@@ -72,17 +68,17 @@ model Course {
 }
 
 model Enrollment {
-  id            String    @id @default(cuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
-  courseId      String
-  course        Course    @relation(fields: [courseId], references: [id])
-  status        String    @default("ACTIVE")
-  progress      Int       @default(0)
-  enrolledAt    DateTime  @default(now())
-  completedAt   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  userId      String
+  courseId    String
+  status      String    @default("ACTIVE")
+  progress    Int       @default(0)
+  enrolledAt  DateTime  @default(now())
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  course      Course    @relation(fields: [courseId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
 
   @@unique([userId, courseId])
   @@index([userId])
@@ -91,20 +87,20 @@ model Enrollment {
 }
 
 model Video {
-  id            String    @id @default(cuid())
-  title         String
-  description   String?
-  url           String
-  thumbnail     String?
-  duration      String?
-  courseId      String
-  course        Course    @relation(fields: [courseId], references: [id])
-  teacherId     String
-  teacher       User      @relation("TeacherVideos", fields: [teacherId], references: [id])
-  views         Int       @default(0)
-  status        String    @default("DRAFT")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  url         String
+  thumbnail   String?
+  duration    String?
+  courseId    String
+  teacherId   String
+  views       Int      @default(0)
+  status      String   @default("DRAFT")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  course      Course   @relation(fields: [courseId], references: [id])
+  teacher     User     @relation("TeacherVideos", fields: [teacherId], references: [id])
 
   @@index([courseId])
   @@index([teacherId])
@@ -112,25 +108,23 @@ model Video {
 }
 
 model Test {
-  id            String    @id @default(cuid())
-  title         String
-  description   String?
-  subject       String
-  duration      Int
-  totalMarks    Int
-  passingMarks  Int       @default(0)
-  pdfUrl        String?
-  courseId      String?
-  course        Course?   @relation(fields: [courseId], references: [id])
-  teacherId     String
-  teacher       User      @relation("TeacherTests", fields: [teacherId], references: [id])
-  isPublished   Boolean   @default(false)
-  status        String    @default("DRAFT")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // Relations
-  results       TestResult[]
+  id           String       @id @default(cuid())
+  title        String
+  description  String?
+  subject      String
+  duration     Int
+  totalMarks   Int
+  passingMarks Int          @default(0)
+  pdfUrl       String?
+  courseId     String?
+  teacherId    String
+  isPublished  Boolean      @default(false)
+  status       String       @default("DRAFT")
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  results      TestResult[]
+  course       Course?      @relation(fields: [courseId], references: [id])
+  teacher      User         @relation("TeacherTests", fields: [teacherId], references: [id])
 
   @@index([teacherId])
   @@index([courseId])
@@ -138,40 +132,40 @@ model Test {
 }
 
 model TestResult {
-  id            String    @id @default(cuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
-  testId        String
-  test          Test      @relation(fields: [testId], references: [id])
-  score         Float
-  totalMarks    Float
-  percentage    Float
-  status        String    @default("PENDING")
-  isPassed      Boolean   @default(false)
-  submittedAt   DateTime  @default(now())
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String   @id @default(cuid())
+  userId      String
+  testId      String
+  score       Float
+  totalMarks  Float
+  percentage  Float
+  status      String   @default("PENDING")
+  isPassed    Boolean  @default(false)
+  submittedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  test        Test     @relation(fields: [testId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
 
+  @@unique([userId, testId])
   @@index([userId])
   @@index([testId])
-  @@unique([userId, testId])
   @@map("test_results")
 }
 
 model Order {
-  id            String    @id @default(cuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
-  courseId      String?
-  course        Course?   @relation(fields: [courseId], references: [id])
-  orderId       String?
-  paymentId     String?
-  signature     String?
-  amount        Float
-  currency      String    @default("INR")
-  status        String    @default("PENDING")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String?
+  orderId   String?
+  paymentId String?
+  signature String?
+  amount    Float
+  currency  String   @default("INR")
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  course    Course?  @relation(fields: [courseId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([orderId])
@@ -180,22 +174,22 @@ model Order {
 }
 
 model CurrentAffair {
-  id            String    @id @default(cuid())
-  title         String
-  slug          String    @unique
-  content       String
-  summary       String?
-  category      String    @default("GENERAL")
-  date          DateTime  @default(now())
-  pdfUrl        String?
-  imageUrl      String?
-  tags          String[]
-  views         Int       @default(0)
-  isPublished   Boolean   @default(true)
-  teacherId     String
-  teacher       User      @relation(fields: [teacherId], references: [id])
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String
+  summary     String?
+  category    String   @default("GENERAL")
+  date        DateTime @default(now())
+  pdfUrl      String?
+  imageUrl    String?
+  tags        String[]
+  views       Int      @default(0)
+  isPublished Boolean  @default(true)
+  teacherId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  teacher     User     @relation(fields: [teacherId], references: [id])
 
   @@index([date])
   @@index([category])
@@ -204,16 +198,16 @@ model CurrentAffair {
 }
 
 model Review {
-  id            String    @id @default(cuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
-  courseId      String
-  course        Course    @relation(fields: [courseId], references: [id])
-  rating        Int       @default(5)
-  comment       String?
-  isApproved    Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id         String   @id @default(cuid())
+  userId     String
+  courseId   String
+  rating     Int      @default(5)
+  comment    String?
+  isApproved Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  course     Course   @relation(fields: [courseId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, courseId])
   @@index([courseId])
